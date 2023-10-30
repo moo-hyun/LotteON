@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="co.kr.lotteon.mapper.admin.LtAdminCsMapper">
+
+    <!-- notice list -->
+
+    <select id="selectNoticeList" resultType="co.kr.lotteon.dto.LtCsNoticeDTO">
+        SELECT a.*, c.c2Name
+        FROM lt_cs_notice a
+        INNER JOIN lt_cs_cate2 c ON a.cate2 = c.cate2
+        ORDER BY a.no DESC LIMIT #{start}, 10;
+    </select>
+
+    <!-- notice update -->
+    <update id="updateAdminNotice" parameterType="co.kr.lotteon.dto.LtCsNoticeDTO">
+        UPDATE lt_cs_notice SET title = #{title},
+                                content = #{content}
+        WHERE noticeNo = #{noticeNo}
+    </update>
+
+</mapper>

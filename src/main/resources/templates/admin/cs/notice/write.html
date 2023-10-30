@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org"
+       xmlns:layout="http://www.thymeleaf.org"
+       layout:decorate="/admin/admin_layout">
+
+<section id="admin-cs-notice-write" layout:fragment="content">
+
+  <script>
+    const ctx = '';
+  </script>
+  <script th:src="@{/cs/js/setNoticeCategory.js}"></script>
+
+    <nav>
+      <h3>공지사항 작성</h3>
+      <p>
+        HOME > 고객센터 > <strong>공지사항</strong>
+      </p>
+    </nav>
+    <section class="write">
+      <article>
+        <form th:action="@{/admin/cs/notice/write}" method="post">
+          <input type="hidden" name="writer" th:value="${#authentication.principal.user.uid}">
+          <!-- 상품분류 -->
+          <section>
+            <table class="csInputTable">
+              <tr>
+                <td>유형</td>
+                <td>
+                  <select name="cate1" id="cate1">
+                    <option value="">대분류 선택</option>
+                  </select>
+                  <select name="cate2" id="cate2">
+                    <option value="">상세유형 선택</option>
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td>제목</td>
+                <td>
+                  <input type="text" name="title" placeholder="제목을 입력하세요."/>
+                </td>
+              </tr>
+              <tr>
+                <td>내용</td>
+                <td>
+                  <textarea name="content" placeholder="내용을 입력하세요."></textarea>
+                </td>
+              </tr>
+            </table>
+          </section>
+
+          <a href="./list.html" class="btnList">취소하기</a>
+          <input type="submit" value="등록하기" class="onclick"/>
+        </form>
+      </article>
+    </section>
+
+</section>
+
+</html>

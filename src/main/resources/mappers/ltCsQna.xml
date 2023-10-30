@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="co.kr.lotteon.mapper.cs.LtCsQnaMapper">
+
+	<insert id="insertQnaWrite">
+		INSERT INTO `lt_cs_qna` (cate1, cate2, title, content, file1, file2, writer,answerComplete, regip, rdate)
+		VALUES (#{cate1}, #{cate2}, #{title}, #{content}, #{file1}, #{file2}, #{writer},#{answerComplete}, #{regip}, #{rdate});
+	</insert>
+
+	<select id="selectCsQnaListAll" parameterType="map" resultType="map">
+		SELECT * FROM `lt_cs_qna` AS a
+		JOIN `lt_cs_cate2` AS b
+		ON a.cate1 = b.cate1 AND a.cate2 = b.cate2 WHERE `parent`=0 ORDER BY `qnaNo` DESC LIMIT #{start}, 10;
+	</select>
+
+	<select id="selectCsQnaListCate" parameterType="map" resultType="map">
+		SELECT * FROM `lt_cs_qna` AS a
+		JOIN `lt_cs_cate2` AS b
+		ON a.cate1 = b.cate1 AND a.cate2 = b.cate2 WHERE a.cate1= #{cate1} AND `parent`=0 ORDER BY `qnaNo` DESC LIMIT #{start}, 10;
+	</select>
+
+	<select id="selectCsQnaTotalCate" resultType="int">
+		SELECT COUNT(*) FROM `lt_cs_qna` WHERE cate1 = #{cate1, jdbcType=INTEGER} AND `parent`=0;
+	</select>
+
+	<select id="selectCsQnaTotal">
+		SELECT COUNT(*) FROM `lt_cs_qna` WHERE `parent`=0;
+	</select>
+
+	<select id="selectCsQnaView" resultType="co.kr.lotteon.dto.LtCsQnaDTO">
+		SELECT * FROM `lt_cs_qna` AS a
+		JOIN `lt_cs_cate2` AS b
+		ON a.cate1 = b.cate1 AND a.cate2 = b.cate2 WHERE `qnaNo`= #{qnaNo}
+	</select>
+
+
+	<select id="selectCsAdminQnaView" resultType="co.kr.lotteon.dto.LtCsQnaDTO">
+		SELECT * FROM `lt_cs_qna` AS a
+				JOIN `lt_cs_cate1` as b
+				JOIN `lt_cs_cate2` as c
+				ON a.cate1 = c.cate1 AND a.cate2 = c.cate2 AND a.cate1 = b.cate1
+		WHERE `qnaNo` = #{qnaNo}
+	</select>
+
+	<select id="selectComment" resultType="co.kr.lotteon.dto.LtCsQnaDTO">
+		SELECT * FROM `lt_cs_qna` WHERE `parent` = #{qnaNo}
+	</select>
+
+
+	<select id="selectCsQnaBoard" resultType="co.kr.lotteon.dto.LtCsQnaDTO">
+		SELECT * FROM `lt_cs_qna` AS a
+		JOIN `lt_cs_cate2` AS b
+		ON a.cate1 = b.cate1 AND a.cate2 = b.cate2 WHERE `qnaNo`=#{qnaNo}
+	</select>
+
+	<update id="updateQnaBoard">
+		UPDATE `lt_cs_qna` SET `content`=#{content} WHERE `qnaNo`=#{qnaNo}
+	</update>
+	
+	<delete id="deleteQnaBoard">
+		DELETE FROM `lt_cs_qna` WHERE `qnaNo`=#{qnaNo}
+	</delete>
+
+	<select id="selectCsQnaChildBoard" resultType="co.kr.lotteon.dto.LtCsQnaDTO">
+		SELECT * FROM `lt_cs_qna` WHERE `parent`=#{qnaNo};
+	</select>
+
+
+
+</mapper>

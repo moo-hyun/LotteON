@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.thymeleaf.org"
+      xmlns="http://www.w3.org/1999/html"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>롯데ON::대한민국 1등 온라인 쇼핑몰</title>
+    <th:block th:replace="/fragments/config :: configFragment"></th:block>
+    <script th:src="@{/js/myJs/jquery.star-rating-svg.min.js}"></script>
+    <script th:src="@{/js/myJs/popup.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/my/star-rating-svg.css}">
+    <link rel="stylesheet" th:href="@{/css/my/style.css}">
+    <script>
+        window.onload = () => {
+            const nowURL = new URL(location.href) + "";
+            // '/my/' 이후, 마지막 '/' 이전 추출
+            const mySlashPoint = nowURL.lastIndexOf('/my/');
+            let endPoint = nowURL.lastIndexOf("/");
+            if(mySlashPoint === endPoint-3) endPoint = nowURL.length;
+            let whereAt = nowURL.substr( mySlashPoint+ 4, endPoint);
+            // 파라미터 쳐내기
+            let endQuestionPoint = whereAt.lastIndexOf("?");
+            if(endQuestionPoint !== -1) whereAt = whereAt.substring(0, endQuestionPoint);
+            // # 쳐내기
+            if(whereAt.endsWith('#')) whereAt  =whereAt.substring(0, whereAt.length-1);
+            console.log(whereAt);
+            const myHomeWrapper = document.getElementById('myHomeWrapper');
+            myHomeWrapper.className = whereAt;
+        }
+    </script>
+
+</head>
+<body>
+<div id="wrapper">
+    <header>
+        <th:block th:replace="/fragments/_top_logo_search :: topLogoSearchFragment"></th:block>
+    </header>
+    <div id="my">
+        <th:block th:replace="/fragments/my/myTopMenu :: myTopMenuFragment"></th:block>
+        <!-- 클릭시 class name 바꾸는 작업 JS처리 해야함 안그럼 css 적용 x default home으로 잡음 -->
+        <div class="home" id="myHomeWrapper">
+            <th:block th:replace="/fragments/my/myAsideMenu :: myAsideMenuFrament"></th:block>
+            <!-- content -->
+            <section layout:fragment="content"></section>
+            <!-- content end -->
+        </div>
+    </div>
+    <th:block th:replace="/fragments/footer :: footerFragment"></th:block>
+    <th:block th:replace="/fragments/my/myPopUp :: myPopUpFragment"></th:block>
+</div>
+</body>
+</html>

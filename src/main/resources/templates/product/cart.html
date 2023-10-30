@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org"
+       xmlns:layout="http://www.thymeleaf.org"
+       layout:decorate="/product/_prod_layout">
+<!-- 장바구니 페이지 시작 -->
+<section class="cart" layout:fragment="content">
+    <script th:src="@{/js/prodJs/prodCart.js}"></script>
+    <!-- 제목, 페이지 네비게이션 -->
+    <nav>
+        <h1>장바구니</h1>
+        <p>
+            HOME > <span>패션·의류·뷰티</span> > <strong>장바구니</strong>
+        </p>
+    </nav>
+
+    <form id="formOrder" th:action="@{/product/order}" method="post">
+        <!-- 장바구니 목록 -->
+        <table class="cartTable">
+            <thead>
+            <tr>
+                <th><input type="checkbox" name="all"/></th>
+                <th>상품명</th>
+                <th>총수량</th>
+                <th>판매가</th>
+                <th>할인</th>
+                <th>포인트</th>
+                <th>배송비</th>
+                <th>소계</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${dtoList.size() eq 0}" class="cartEmpty">
+                <td colspan="8">장바구니에 상품이 없습니다.</td>
+            </tr>
+            <tr th:each="cart:${dtoList}" th:class="${cart.cartNo}">
+                <td>
+                    <input type="checkbox" name="chk" th:class="${cart.cartNo}" th:value="${cart.cartNo}">
+                    <input type="hidden" th:name="prodNo + ${cart.cartNo }" th:value="${cart.product.prodNo }"/>
+                </td>
+                <td>
+                    <article>
+                        <a th:href="@{/product/view(prodNo=${cart.prodNo}, cate1=${cart.product.prodCate1}, cate2=${cart.product.prodCate2})}" class="thumb">
+                            <img th:src="@{'/thumbs/' + ${cart.product.thumb1}}" alt="상품이미지"/>
+                        </a>
+                        <div class="w450">
+                            <h2>
+                                <a th:href="@{/product/view(prodNo=${cart.prodNo}, cate1=${cart.product.prodCate1}, cate2=${cart.product.prodCate2})}">
+                                    [[${cart.product.prodName}]]
+                                </a>
+                            </h2>
+                            <p class="overHidden">[[${cart.product.descript}]]</p>
+                        </div>
+                    </article>
+                </td>
+                <td>
+                    <input type="hidden" th:name="count + ${cart.cartNo }" th:value="${cart.count }"/>
+                    [[${cart.count}]]
+                </td>
+                <td>
+                    <input type="hidden" th:name="price + ${cart.cartNo }" th:value="${cart.product.price }"/>
+                    <span class="finalPrice">
+                        [[${cart.product.finalPriceSub}]]
+                    </span>
+                    <span class="origPrice">
+                        ( [[${cart.product.priceSub}]] )
+                    </span>
+                </td>
+                <td>
+                    <input type="hidden" th:name="discount + ${cart.cartNo }" th:value="${cart.product.discount }"/>
+                    <input type="hidden" th:name="disPrice + ${cart.cartNo }" th:value="${cart.product.discountPrice }"/>
+                    [[${cart.product.discount}]]%
+                </td>
+                <td>
+                    <input type="hidden" th:name="point + ${cart.cartNo }" th:value="${cart.product.point }"/>
+                    [[${cart.product.point}]]
+                </td>
+                <td>
+                    <input type="hidden" th:name="delivery + ${cart.cartNo }" th:value="${cart.product.delivery }"/>
+                    <span th:if="${cart.product.delivery eq 0}">
+                      무료배송
+                    </span>
+                    <span th:if="${cart.product.delivery gt 0}">
+                      [[${cart.product.deliverySub}]]원
+                    </span>
+                </td>
+                <td>
+                    <input type="hidden" th:name="total + ${cart.cartNo }" th:value="${cart.total }"/>
+                    [[${#numbers.formatInteger((cart.product.price-cart.product.discountPrice)*cart.count +cart.product.delivery,0,'COMMA')}]]
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <input class="cartDelete" id="cartDelete" type="button" name="del" value="선택삭제">
+        <!-- 장바구니 전체합계 -->
+        <div class="total">
+            <h2>전체합계</h2>
+            <table>
+                <tr>
+                    <td>상품수</td>
+                    <td>
+                        <span id="count" class="totalForm">0</span>
+                        <input type="hidden" name="totalCount" value="0">
+                    </td>
+                </tr>
+                <tr>
+                    <td>상품금액</td>
+                    <td>
+                        <span id="price" class="totalForm">0</span>
+                        <input type="hidden" name="totalPrice" value="0">
+                    </td>
+                </tr>
+                <tr>
+                    <td>할인금액</td>
+                    <td>
+                        -<span id="disPrice" class="totalForm">0</span>
+                        <input type="hidden" name="totalDiscount" value="0">
+                    </td>
+                </tr>
+                <tr>
+                    <td>배송비</td>
+                    <td>
+                        <span id="delivery" class="totalForm">0</span>
+                        <input type="hidden" name="totalDelivery" value="0">
+                    </td>
+                </tr>
+                <tr>
+                    <td>포인트</td>
+                    <td>
+                        <span id="point" class="totalForm">0</span>
+                        <input type="hidden" name="totalPoint" value="0">
+                    </td>
+                </tr>
+                <tr>
+                    <td>전체주문금액</td>
+                    <td>
+                        <span id="total" class="totalForm">0</span>
+                        <input type="hidden" name="totalSumPrice" value="0">
+                    </td>
+                </tr>
+            </table>
+            <input type="submit"  value="주문하기">
+        </div>
+    </form>
+</section>
+<!-- 장바구니 페이지 끝 -->
+
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org"
+       xmlns:layout="http://www.thymeleaf.org"
+       layout:decorate="/product/_prod_layout">
+
+<!-- 리스트 페이지 시작 -->
+<section class="list" layout:fragment="content">
+    <!-- 제목, 페이지 네비게이션 -->
+    <nav>
+        <h1>상품목록</h1>
+        <p>HOME > <span>패션·의류·뷰티</span> > <strong>남성의류</strong></p>
+    </nav>
+
+    <!-- 정렬 메뉴 -->
+    <ul class="sort">
+        <li><a th:href="@{#}" class="on">판매많은순</a></li>
+        <li><a th:href="@{#}">낮은가격순</a></li>
+        <li><a th:href="@{#}">높은가격순</a></li>
+        <li><a th:href="@{#}">평점높은순</a></li>
+        <li><a th:href="@{#}">후기많은순</a></li>
+        <li><a th:href="@{#}">최근등록순</a></li>
+    </ul>
+
+    <!-- 상품목록 -->
+    <table border="0">
+        <!-- prod_list_test -->
+        <th:block th:each="product:${pageResponseDTO.getDtoList()}">
+        <tr>
+            <td><a th:href="@{/product/view(prodNo = ${product.prodNo})}" class="thumb"><img th:src="@{'/thumbs/'+${product.Thumb1}}" alt="상품이미지"/></a></td>
+            <td>
+                <h3 class="name">[[${product.prodName}]]</h3>
+                <a th:href="@{/product/view(prodNo = ${product.prodNo})}" class="desc">[[${product.descript}]]</a>
+            </td>
+            <td>
+                <ul>
+                    <li><ins class="dis-price">[[${#numbers.formatInteger((product.price-product.discountPrice),0,'COMMA')}]]</ins></li>
+                    <li>
+                        <del class="org-price">[[${#numbers.formatInteger(product.price,0,'COMMA')}]]</del>
+                        <span class="discount">[[${#numbers.formatInteger(product.discount,0,'COMMA')}]]%</span>
+                    </li>
+                    <li>
+                        <span class="delivery" th:if="${product.delivery gt 0}">[[${#numbers.formatInteger(product.delivery,0,'COMMA')}]]원</span>
+                        <span class="free-delivery" th:if="${product.delivery eq 0}">무료배송</span>
+                    </li>
+                </ul>
+            </td>
+            <td>
+                <h4 class="seller"><i class="fas fa-home"></i>&nbsp;[[${product.seller}]]</h4>
+                <h5 class="badge power">판매자등급</h5>
+                <h6 class="rating" th:classappend="${'star' + #numbers.formatDecimal(product.score,1,0) }">[[${#numbers.formatDecimal(product.score,1,1)}]]</h6>
+            </td>
+        </tr>
+        </th:block>
+    </table>
+
+    <!-- 상품목록 페이지번호 -->
+
+
+    <div class="paging">
+        <span class="prev" th:if="${pageResponseDTO.prev}">
+            <a th:href="@{/product/list(cate1=${pageResponseDTO.cate1},pg=${pageResponseDTO.start - 1})}"><&nbsp;이전</a>
+        </span>
+        <span class="num"  th:each="num: ${#numbers.sequence(pageResponseDTO.start, pageResponseDTO.end)}">
+            <a th:href="@{/product/list(cate1=${pageResponseDTO.cate1},pg=${num})}" th:classappend="${num == pageResponseDTO.pg?'on':''}">[[${num}]]</a>
+        </span>
+        <span class="next" th:if="${pageResponseDTO.next}">
+            <a th:href="@{/product/list(cate1=${pageResponseDTO.cate1},pg=${pageResponseDTO.end + 1})}">다음&nbsp;></a>
+        </span>
+    </div>
+
+
+</section>
+<!-- 리스트 페이지 끝 -->
+
+</html>

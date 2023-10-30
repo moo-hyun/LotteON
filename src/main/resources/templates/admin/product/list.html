@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html"
+      layout:decorate="/admin/admin_layout">
+<!-- list -->
+<section id="admin-product-list" layout:fragment="content">
+    <nav>
+        <h3>상품현황</h3>
+        <p>
+            HOME > 상품관리 > <strong>상품목록</strong>
+        </p>
+    </nav>
+    <!-- 상품목록 컨텐츠 시작 -->
+    <section>
+
+        <div>
+            <form id="formSearch" th:action="@{/admin/product/list}" method="get">
+            <input type="hidden" name="seller" th:value="${#authentication.principal.user.manager}">
+            <select name="searchType">
+                <option value="prodName">상품명</option>
+                <option value="prodNo">상품코드</option>
+                <option value="company">제조사</option>
+            </select>
+                <input type="text" name="searchKeyword" />
+            <button id="btnSearch">검색</button>
+            </form>
+        </div>
+
+        <form id="formCheck" th:action="@{/admin/product/delete}" method="post">
+        <input type="hidden" name="chkList" />
+        <table>
+            <tr>
+                <th><input type="checkbox" name="all"/></th>
+                <th>이미지</th>
+                <th>상품코드</th>
+                <th>상품명</th>
+                <th>판매가격</th>
+                <th>할인율</th>
+                <th>포인트</th>
+                <th>재고</th>
+                <th>판매자</th>
+                <th>조회</th>
+                <th>관리</th>
+            </tr>
+            <tr th:each="ltProduct : ${prodPageResponseDTO.dtoList}">
+                <td><input type="checkbox" name="chk" th:value="${ltProduct.prodNo}"/></td>
+
+                <td><img th:src="@{'/thumbs/'+${ltProduct.Thumb1}}" class="thumb"></td>
+
+                <td>[[${ltProduct.prodNo}]]</td>
+                <td>[[${ltProduct.prodName}]]</td>
+                <td>[[${ltProduct.price != 0 ? #numbers.formatInteger(ltProduct.price, 0, 'COMMA') : '0'}]]</td>
+                <td>[[${ltProduct.discount}]]%</td>
+                <td>[[${ltProduct.point != 0 ? #numbers.formatInteger(ltProduct.point, 0, 'COMMA') : '0'}]]</td>
+                <td>[[${ltProduct.stock != 0 ? #numbers.formatInteger(ltProduct.stock, 0, 'COMMA') : '0'}]]</td>
+                <td>[[${ltProduct.seller}]]</td>
+                <td>[[${ltProduct.hit != 0 ? #numbers.formatInteger(ltProduct.hit, 0, 'COMMA') : '0'}]]</td>
+                <td>
+                    <a class="ltBtnDelete" th:href="@{/admin/product/delete(prodNo=${ltProduct.prodNo})}">[삭제]</a>
+                    <a th:href="@{/admin/product/modify(prodNo=${ltProduct.prodNo})}">[수정]</a>
+            </tr>
+                </td>
+        </table>
+        </form>
+
+        <div>
+            <input type="button" class="ltBtnChkDelete" value="선택삭제"/>
+            <a th:href="@{/admin/product/register}" id="register">상품등록</a>
+        </div>
+
+        <div class="paging">
+            <span class="prev" th:if="${prodPageResponseDTO.prev}" >
+                            <a th:href="@{/admin/product/list(pg=${prodPageResponseDTO.start - 1},searchType=${prodPageResponseDTO.getSearchType()},searchKeyword=${prodPageResponseDTO.getSearchKeyword()},searchProdNo=${prodPageResponseDTO.getSearchProdNo()})}"><&nbsp;이전</a>
+                        </span>
+            <span class="num" th:each="num:${#numbers.sequence(prodPageResponseDTO.start, prodPageResponseDTO.end)}">
+                            <a th:href="@{/admin/product/list(pg=${num},searchType=${prodPageResponseDTO.getSearchType()},searchKeyword=${prodPageResponseDTO.getSearchKeyword()},searchProdNo=${prodPageResponseDTO.getSearchProdNo()})}"  class="on">[[${num}]]</a>
+                        </span>
+            <span class="next" th:if="${prodPageResponseDTO.next}">
+                            <a th:href="@{/admin/product/list(pg=${prodPageResponseDTO.end + 1},searchType=${prodPageResponseDTO.getSearchType()},searchKeyword=${prodPageResponseDTO.getSearchKeyword()},searchProdNo=${prodPageResponseDTO.getSearchProdNo()})}">다음&nbsp;></a>
+                        </span>
+        </div>
+
+    </section>
+    <!-- 상품목록 컨텐츠 끝 -->
+</section>
+</html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns="http://www.w3.org/1999/html"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<header  th:fragment="headerFragment">
+    <div>
+        <a th:href="@{/admin/index}" class="logo"><img th:src="@{/admin/images/admin_logo.png}" alt="admin_logo"/></a>
+        <p>
+
+            <th:block sec:authorize="isAuthenticated()">
+                <span>[[${#authentication.principal.user.name}]]님 반갑습니다.</span>
+                <a th:href="@{/admin/index}">HOME |</a>
+                <a th:href="@{/member/logout}">로그아웃 |</a>
+                <a th:href="@{/cs/index}">고객센터</a>
+            </th:block>
+            <th:block sec:authorize="!isAuthenticated()">
+                <a th:href="@{/member/login}">로그인</a>
+                <a th:href="@{/member/join}">회원가입</a>
+            </th:block>
+        </p>
+    </div>
+</header>
+
+
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org"
+       xmlns:layout="http://www.thymeleaf.org"
+       layout:decorate="/member/_layout.html">
+
+<div class="find findId" layout:fragment="content">
+    <nav>
+        <h1>아이디 찾기</h1>
+    </nav>
+
+    <form id="formFindId" th:action="@{/member/findIdResult}" method="POST">
+        <input type="hidden" name="type" value="FIND_ID"/>
+        <table border="0">
+            <caption>아이디 찾기-이메일 인증</caption>
+            <tr>
+                <th>이름</th>
+                <td>[[${dto.name}]]</td>
+            </tr>
+            <tr>
+                <th>아이디</th>
+                <td>[[${dto.uid}]]</td>
+            </tr>
+            <tr>
+                <th>이메일</th>
+                <td>[[${dto.email}]]</td>
+            </tr>
+            <tr>
+                <th>가입일</th>
+                <td>[[${dto.rDate}]]</td>
+            </tr>
+        </table>
+        <div class="btnArea">
+            <a th:href="@{/member/login}" class="loginPg">로그인</a>
+            <a th:href="@{/member/findPass}" class="findIdResult">비밀번호 찾기</a>
+        </div>
+    </form>
+
+
+</div>
+</html>

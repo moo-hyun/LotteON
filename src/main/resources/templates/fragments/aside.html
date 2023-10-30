@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns="http://www.w3.org/1999/html">
+
+<th:block th:fragment="asideFragment">
+  <!-- 카테고리/베스트 상품 영역 -->
+<aside>
+  <!-- 카테고리 -->
+  <th:block th:replace="/fragments/category :: categoryFragment"></th:block>
+
+  <!-- 베스트상품 배너 -->
+  <article class="best">
+    <h1><i class="fas fa-crown"></i>베스트상품</h1>
+    <ol>
+      <li th:each="sold : ${soldTop5}">
+        <a th:href="@{/product/view(prodNo = ${sold.prodNo})}">
+          <div class="thumb">
+            <i>[[${soldStat.count}]]</i>
+            <img th:src="@{'/thumbs/'+${sold.Thumb1}}" alt="item1" />
+          </div>
+          <h2>[[${sold.prodName}]]</h2>
+          <div class="org_price">
+            <del>[[${#numbers.formatInteger(sold.price,0,'COMMA')}]]</del>
+            <span>[[${#numbers.formatInteger(sold.discount,0,'COMMA')}]]%</span>
+          </div>
+          <div class="dis_price">
+            <ins>[[${#numbers.formatInteger(sold.price - ((sold.price * sold.discount)/1000*10),0,'COMMA')}]]</ins>
+          </div>
+        </a>
+      </li>
+    </ol>
+  </article>
+</aside>
+<!-- 카테고리/베스트 상품 영역 -->
+</th:block>
+</html>

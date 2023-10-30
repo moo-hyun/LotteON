@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="co.kr.lotteon.mapper.cs.LtCsIndexMapper">
+
+	<select id="selectCsNotices" resultType="co.kr.lotteon.dto.LtCsNoticeDTO">
+		SELECT *, b.c2Name FROM `lt_cs_notice` AS a
+		JOIN `lt_cs_cate2` AS b
+		ON a.cate1 = b.cate1 AND a.cate2 = b.cate2 ORDER BY `noticeNo` DESC LIMIT 5
+	</select>
+
+	<select id="selectCsQna" resultType="co.kr.lotteon.dto.LtCsQnaDTO">
+		SELECT * FROM `lt_cs_qna` AS a
+		JOIN `lt_cs_cate1` AS b
+		ON a.cate1 = b.cate1 WHERE `parent`=0 ORDER BY `qnaNo` DESC LIMIT 5
+	</select>
+
+
+
+
+</mapper>

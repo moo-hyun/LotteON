@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.thymeleaf.org"
+      xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>롯데ON::관리자 페이지</title>
+    <th:block th:replace="/fragments/admin/config :: configFragment"></th:block>
+    <script>
+        //1차, 2차 카테고리
+        function changeSelect() {
+            const selectValue = $('#selectBox').val();
+            console.log("selectValue : "+selectValue);
+            $.ajax({
+                url: '/LotteON/admin/product/cate2/'+selectValue,
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    console.log("data : "+data);
+
+                    const cate2Select = $('#cate2');
+                    cate2Select.empty(); // 기존 옵션을 모두 제거합니다.
+
+                    // 새로운 옵션 추가
+                    cate2Select.append($('<option>', {
+                        value: '',
+                        text: '2차 분류 선택',
+                        disabled: 'disabled',
+                        selected: 'selected'
+                    }));
+
+                    // 데이터를 이용하여 옵션을 동적으로 생성
+                    data.forEach(function(item) {
+                        cate2Select.append($('<option>', {
+                            value: item.cate2,
+                            text: item.c2Name
+                        }));
+                    });
+                }
+            });
+        }
+
+        //자동 포인트(가격 입력 시)
+        $(document).ready(function () {
+            $('input[name=priceFromUser]').focusout(function () {
+                const price = $(this).val();
+                // 소수점을 제거하고 정수 부분만 사용
+                const priceWithoutDecimal = Math.floor(parseFloat(price) * 100) / 100; // 두 자리 소수점까지
+                const point = $('input[name=pointFromUser]');
+
+                // 최종 포인트 계산 후 정수로 변환
+                const calculatedPoint = Math.floor(priceWithoutDecimal * 0.01);
+
+                point.val(calculatedPoint);
+            });
+        });
+
+        //금액 자동 콤마
+        $(document).ready(function () {
+            $('input[name="priceFromUser"]').focusout(function () {
+                const price = $(this).val();
+                const priceWithoutCommas = price.replace(/,/g, ''); // 입력된 값에서 기존 콤마 제거
+                const numericPrice = parseFloat(priceWithoutCommas); // 문자열을 숫자로 변환
+
+                if (!isNaN(numericPrice)) {
+                    const formattedPrice = numericPrice.toLocaleString(); // 로캘에 따른 형식으로 변환
+                    $(this).val(formattedPrice)
+                    $('.nocommaPR').val(numericPrice)
+                }
+            });
+        });
+        $(document).ready(function () {
+            $('input[name="pointFromUser"]').focusout(function () {
+                const point = $(this).val();
+                const pointWithoutCommas = point.replace(/,/g, ''); // 입력된 값에서 기존 콤마 제거
+                const numericPoint = parseFloat(pointWithoutCommas); // 문자열을 숫자로 변환
+
+                if (!isNaN(numericPoint)) {
+                    const formattedPoint = numericPoint.toLocaleString(); // 로캘에 따른 형식으로 변환
+                    $(this).val(formattedPoint)
+                    $('.nocommaP').val(numericPoint)
+                }
+            });
+        });
+        $(document).ready(function () {
+            $('input[name="stockFromUser"]').focusout(function () {
+                const stock = $(this).val();
+                const stockWithoutCommas = stock.replace(/,/g, ''); // 입력된 값에서 기존 콤마 제거
+                const numericStock = parseFloat(stockWithoutCommas); // 문자열을 숫자로 변환
+
+                if (!isNaN(numericStock)) {
+                    const formattedStock = numericStock.toLocaleString(); // 로캘에 따른 형식으로 변환
+                    $(this).val(formattedStock)
+                    $('.nocommaS').val(numericStock)
+                }
+            });
+        });
+        $(document).ready(function () {
+            $('input[name="deliveryFromUser"]').focusout(function () {
+                const delivery = $(this).val();
+                const deliveryWithoutCommas = delivery.replace(/,/g, ''); // 입력된 값에서 기존 콤마 제거
+                const numericDelivery = parseFloat(deliveryWithoutCommas); // 문자열을 숫자로 변환
+
+                if (!isNaN(numericDelivery)) {
+                    const formattedDelivery = numericDelivery.toLocaleString(); // 로캘에 따른 형식으로 변환
+                    $(this).val(formattedDelivery)
+                    $('.nocommaD').val(numericDelivery)
+                }
+            });
+        });
+
+        //list
+        $(function(){
+            $('input[name=all]').change(function(){
+                const isChecked = $(this).is(':checked');
+
+                if(isChecked){
+                    // 전체선택
+                    $('input[name=chk]').prop('checked', true);
+                }else{
+                    // 전체해제
+                    $('input[name=chk]').prop('checked', false);
+                }
+            });
+            $('input[name=chk]').change(function(){
+                const isChecked = $(this).is(':checked');
+
+                if(!isChecked){
+                    // 전체선택
+                    $('input[name=all]').prop('checked', false);
+                }
+            });
+
+            //선택 삭제
+            $('.ltBtnChkDelete').click(function(e) {
+                e.preventDefault();
+                const selectedChks = $('input[name=chk]:checked');
+                console.log(selectedChks)
+                const selectedChksCnt = selectedChks.length;
+
+                var chkList = [];
+                $.each(selectedChks, function (k, v){
+                    chkList.push($(this).val());
+                });
+                console.log(chkList);
+                console.log(chkList.join(','));
+
+                if (selectedChksCnt > 0) {
+                    if (confirm('정말 삭제하시겠습니까?')) {
+                        alert('delete');
+                        $('#formCheck').submit();
+                    }
+
+                }
+            });
+
+            //삭제
+            $('.ltBtnDelete').click(function(e){
+                e.preventDefault();
+                if (confirm('삭제하시겠습니까?')) {
+                    var deleteUrl = $(this).attr('href');
+                    window.location.href = deleteUrl;
+                }
+            });
+        });
+
+        //검색
+        $('#btnSearch').click(function(){
+            $('#formSearch').submit();
+        });
+
+        //banner
+        $(function() {
+            $("#tabs").tabs();
+
+            // 팝업 닫기
+            $('.btnClose').click(function(){
+                $(this).closest('.popup').removeClass('on');
+            });
+
+            // 배너등록 팝업 띄우기
+            $('.btnRegister').click(function(e){
+                e.preventDefault();
+                $('#bannerRegister').addClass('on');
+            });
+        });
+
+    </script>
+</head>
+<body>
+    <div id="wrapper">
+        <!-- header -->
+        <th:block th:replace="/fragments/admin/header :: headerFragment"></th:block>
+        <!-- content -->
+        <main id="admin">
+            <!-- aside -->
+            <th:block th:replace="/fragments/admin/aside :: asideFragment"></th:block>
+            <div layout:fragment="content"></div>
+        </main>
+        <!-- footer -->
+        <th:block th:replace="/fragments/admin/footer :: footerFragment"></th:block>
+    </div>
+</body>
+</html>

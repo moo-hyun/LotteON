@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org"
+       xmlns:layout="http://www.thymeleaf.org"
+       layout:decorate="/my/_my_layout">
+<!-- qna -->
+<section layout:fragment="content">
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+             // 해당 <a> 요소를 선택합니다.
+             var sexLiA = document.querySelector("#my > div > ul > li:nth-child(6)");
+             console.log(sexLiA);
+
+             // 첫 번째 <li> 요소의 <a>에 대한 참조를 선택합니다.
+             var firstLiA = document.querySelector("#my > div > ul > li:nth-child(2)");
+             console.log(firstLiA);
+             // 첫 번째 <li>의 <a>에서 "on" 클래스를 제거합니다.
+             firstLiA.classList.remove('on');
+
+             // <a> 요소에 'on' 클래스를 추가합니다.
+             sexLiA.classList.add('on');
+        });
+
+         function sendQnaNo(event) {
+
+             event.preventDefault(); // 기본 링크 동작 방지
+             var qnaNo = event.target.getAttribute('data-qnaNo'); // data-qnaNo 값을 가져옴
+
+             // 클릭된 title 요소의 부모 tr을 찾습니다.
+             var row = $(event.target).closest('tr');
+
+             // 클릭된 title 요소의 부모 tr 내에서 .answerRow를 찾아 토글합니다.
+             var answerRow = row.next('.answerRow');
+
+             // 현재 answerRow가 보이는지 확인
+             var isAnswerRowVisible = answerRow.is(":visible");
+
+             // 모든 .answerRow 요소 숨기기
+             $('.answerRow').hide();
+
+             // 만약 answerRow가 보이지 않는 경우 (숨겨져 있는 경우)
+             if (!isAnswerRowVisible) {
+                 answerRow.show(); // 보이기
+
+                 // AJAX 요청을 수행
+                 $.ajax({
+                     type: "GET",
+                     url: "/LotteON/my/qna/comment?qnaNo=" + qnaNo,
+                     success: function(data) {
+                         // 서버에서 반환한 데이터를 처리
+                         console.log(data);
+                         var response = data[0];
+                         if(response){
+                             var content = response.content; // JSON 데이터에서 answer 가져오기
+
+                             var title = response.title;
+                             var rdate = response.rdate;
+                             var formattedDate = rdate.replace("T", " ");
+                             console.log(content);
+                             console.log(title);
+                             console.log(formattedDate);
+                             // HTML 요소에 데이터 추가
+                             var contentElement = answerRow.find('.answer .content');
+                             var titleElement = answerRow.find('.answer .tit');
+                             contentElement.text(content);
+                             titleElement.text(title);
+                             var dateSpan = $('<span class="date"></span>').text(formattedDate);
+                             titleElement.append(dateSpan);
+                         } else {
+                         var contentElement = answerRow.find('.answer .content');
+                         var titleElement = answerRow.find('.answer .tit');
+                         contentElement.text("빠른 시일 내에 답변드리겠습니다.");
+                         titleElement.text("답변 검토중입니다!.");
+                             console.error("데이터를 찾을 수 없습니다.");
+                         }
+
+                     },
+                     error: function(error) {
+                         console.error(error);
+                     }
+                 });
+             }
+         }
+    </script>
+    <a href="#"><img th:src="@{/images/my/my_banner2.png}" alt="패션, 타운 하나로 끝" class="banner"></a>
+    <article>
+        <h3>문의하기</h3>
+
+        <table border="0">
+            <tr>
+                <th>번호</th>
+                <th>문의채널</th>
+                <th>문의유형</th>
+                <th>제목</th>
+                <th>작성일</th>
+                <th>상태</th>
+            </tr>
+            <th:block th:each="ltCsQnaDTO, iterStat : ${ltCsQnaDTO}">
+                <tr class="questionRow">
+                    <td class="no" th:text="${pageStartNum - iterStat.index-1}"></td>
+                    <td class="channel">고객센터</td>
+                    <td class="type">[[${ltCsQnaDTO.c2Name}]]</td>
+                    <td class="tit"><a href="#" th:attr="data-qnaNo=${ltCsQnaDTO.qnaNo}" th:text="${ltCsQnaDTO.title}" onclick="sendQnaNo(event)">[[${ltCsQnaDTO.title}]]</a></td>
+                    <td th:text="${#temporals.format(ltCsQnaDTO.rdate, 'yyyy-MM-dd')}"></td>
+                    <th:block>
+                        <td th:class="blue-text" th:if="${ltCsQnaDTO.answerComplete == 2}">답변완료</td>
+                        <td th:class="gray-text" th:if="${ltCsQnaDTO.answerComplete == 1}">검토중</td>
+                    </th:block>
+                <tr class="answerRow">
+                    <td colspan="6">
+                        <div class="question">
+                            <p class="tit">
+                                [[${ltCsQnaDTO.title}]]
+                                <span class="date" th:text="${#temporals.format(ltCsQnaDTO.rdate, 'yyyy-MM-dd HH:mm:ss')}"></span>
+                            </p>
+                            <p class="content">
+                                [[${ltCsQnaDTO.content}]]
+                            </p>
+                        </div>
+                        <div class="answer">
+                            <p class="tit">
+                                <span class="rdate"></span>
+                            </p>
+                            <p class="content"></p>
+                        </div>
+                    </td>
+                </tr>
+                </tr>
+            </th:block>
+
+        </table>
+
+        <p class="page">
+            <th:block th:if="${pageGroupStart > 1}">
+                <a th:href="@{/my/qna(pg=${pageGroupStart - 1})}" class="prev">이전</a>
+            </th:block>
+            <th:block th:each="num:${#numbers.sequence(pageGroupStart, pageGroupEnd)}">
+                <a th:href="@{/my/qna(pg=${num})}" th:classappend="${num == currentPage} ? 'on' : 'num'">[[${num}]]</a>
+            </th:block>
+            <th:block th:if="${pageGroupEnd < lastPageNum}">
+                <a th:href="@{/my/qna(pg=${pageGroupEnd + 1})}" class="next">다음</a>
+            </th:block>
+        </p>
+    </article>
+</section>
+<!-- qna END -->
+</html>

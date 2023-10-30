@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org"
+       xmlns:layout="http://www.thymeleaf.org"
+       layout:decorate="/admin/admin_layout">
+
+<section id="admin-cs-notice-list" class="admin-cs-list" layout:fragment="content">
+  <script>
+
+    $(document).ready(function(){
+
+      const cate1Val = document.getElementsByName("cate1")[0].value;
+      const searchVal = document.getElementsByName("search")[0].value;
+
+      console.log('cate1 : ' + cate1Val + ' / search : ' + searchVal);
+      $(document).on("change","select[name='searchCate1']",function(){
+        $("option:selected", this).each(function(){
+          var selectValue = $(this).val();
+          if(selectValue === "" && selectValue == null){
+            return false;
+          }
+          if( searchVal == null || searchVal === "" ) {
+            location.href = "/LotteON/admin/cs/qna/list?cate1=" + selectValue;
+          } else{
+            location.href = "/LotteON/admin/cs/qna/list?cate1=" + selectValue +"&search="+searchVal;
+          }
+        });
+      });
+
+      $(document).on("focusout","input[name='searchKeyword']",function(){
+        var inputVal = $(this).val();
+        if(inputVal === "" && inputVal == null){
+          return false;
+        }
+        if( cate1Val == null || cate1Val === "" ) {
+          location.href = "/LotteON/admin/cs/qna/list?search=" + inputVal;
+        } else{
+          location.href = "/LotteON/admin/cs/qna/list?cate1=" + cate1Val +"&search="+inputVal;
+        }
+      });
+
+      $('.rjaxhwnd').equals()
+
+
+    });
+
+  </script>
+  <nav>
+    <h3>QnA</h3>
+    <p>
+      HOME > 고객센터 > <strong>QnA</strong>
+    </p>
+  </nav>
+
+  <!-- 공지사항 목록 컨텐츠 시작 -->
+
+<section>
+  <article>
+    <form action="#" method="">
+      <input type="hidden" name="writer" th:value="${qnaDTO.writer}">
+      <input type="hidden" name="qnaNo" th:value="${qnaDTO.qnaNo}">
+      <table>
+        <tr>
+          <td>문의유형</td>
+          <td>[[${qnaDTO.c1Name}]] - [[${qnaDTO.c2Name}]]</td>
+        </tr>
+        <tr>
+          <td>제목</td>
+          <td>
+            <input type="text" name="title" readonly th:value="${qnaDTO.title}"/>
+          </td>
+        </tr>
+        <tr>
+          <td>내용</td>
+          <td>
+            <textarea name="content" readonly >[[${qnaDTO.content}]]</textarea>
+          </td>
+        </tr>
+        <th:block th:if="${qnaDTO.answerComplete eq 2}">
+        <tr th:each="comment : ${commentList}">
+          <td>답변</td>
+          <td>
+            <textarea name="reply" readonly >[[${comment.content}]]</textarea>
+          </td>
+          </th:block>
+          <th:block th:if="${qnaDTO.answerComplete eq 1}">
+            <td>답변</td>
+            <td>
+              <textarea id="reply" name="reply"></textarea>
+            </td>
+          </th:block>
+        </tr>
+      </table>
+      <div>
+        <input id="btnmodify" type="submit" class="btnSubmit" value="답변등록"/>
+        <a th:href="@{/admin/cs/qna/}" class="btnList">목록</a>
+      </div>
+    </form>
+  </article>
+</section>
+  <!-- 상품목록 컨텐츠 끝 -->
+</section>
+</html>

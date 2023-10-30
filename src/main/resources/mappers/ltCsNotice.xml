@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="co.kr.lotteon.mapper.cs.LtCsNoticeMapper">
+
+	<select id="selectCsNoticeListAll" parameterType="map" resultType="map">
+		SELECT * FROM `lt_cs_notice` AS a
+		JOIN `lt_cs_cate2` AS b
+		ON a.cate1 = b.cate1 AND a.cate2 = b.cate2 ORDER BY `noticeNo` DESC LIMIT #{start}, 10;
+	</select>
+
+	<select id="selectCsNoticeListCate" parameterType="map" resultType="map">
+		SELECT * FROM `lt_cs_notice` AS a
+		JOIN `lt_cs_cate2` AS b
+		ON a.cate1 = b.cate1 AND a.cate2 = b.cate2 WHERE a.cate1= #{cate1} ORDER BY `noticeNo` DESC LIMIT #{start}, 10
+	</select>
+
+	<select id="selectCsNoticeTotalCate" resultType="int">
+		SELECT COUNT(*) FROM lt_cs_notice WHERE cate1 = #{cate1, jdbcType=INTEGER}
+	</select>
+
+	<select id="selectCsNoticeTotal">
+		SELECT COUNT(*) FROM `lt_cs_notice`
+	</select>
+
+	<select id="selectCSNoticeView" resultType="co.kr.lotteon.dto.LtCsNoticeDTO">
+		SELECT * FROM `lt_cs_notice` AS a
+		JOIN `lt_cs_cate2` AS b
+		ON a.cate1 = b.cate1 AND a.cate2 = b.cate2 WHERE `noticeNo`= #{noticeNo}
+	</select>
+
+
+</mapper>
+
+

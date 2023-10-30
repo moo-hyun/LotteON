@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org"
+       xmlns:layout="http://www.thymeleaf.org"
+       layout:decorate="/admin/admin_layout">
+
+<section id="admin-cs-notice-list" class="admin-cs-qna-list" layout:fragment="content">
+    <script>
+
+        $(document).ready(function(){
+
+            const cate1Val = document.getElementsByName("cate1")[0].value;
+            const searchVal = document.getElementsByName("search")[0].value;
+
+            console.log('cate1 : ' + cate1Val + ' / search : ' + searchVal);
+            $(document).on("change","select[name='searchCate1']",function(){
+                $("option:selected", this).each(function(){
+                    var selectValue = $(this).val();
+                    if(selectValue === "" && selectValue == null){
+                        return false;
+                    }
+                    if( searchVal == null || searchVal === "" ) {
+                        location.href = "/LotteON/admin/cs/qna/list?cate1=" + selectValue;
+                    } else{
+                        location.href = "/LotteON/admin/cs/qna/list?cate1=" + selectValue +"&search="+searchVal;
+                    }
+                });
+            });
+
+            $(document).on("focusout","input[name='searchKeyword']",function(){
+                var inputVal = $(this).val();
+                if(inputVal === "" && inputVal == null){
+                    return false;
+                }
+                if( cate1Val == null || cate1Val === "" ) {
+                    location.href = "/LotteON/admin/cs/qna/list?search=" + inputVal;
+                } else{
+                    location.href = "/LotteON/admin/cs/qna/list?cate1=" + cate1Val +"&search="+inputVal;
+                }
+            });
+
+            // 게시글 하나만 삭제
+            $('.noticeDelete').click(function (e){
+                e.preventDefault();
+                var confirmDelete = confirm('삭제 ? ');
+                if(confirmDelete) {
+                    var deleteUrl = $(this).attr('href');
+                    window.location.href = deleteUrl;
+                }
+
+            });
+            $('.rjaxhwnd').equals()
+
+
+        });
+
+    </script>
+    <nav>
+        <h3>QnA 목록</h3>
+        <p>
+            HOME > 고객센터 > <strong>QnA</strong>
+        </p>
+    </nav>
+
+    <!-- 공지사항 목록 컨텐츠 시작 -->
+
+<section>
+    <form th:action="@{#}" method="post">
+        <div>
+            <select name="searchCate1" id="searchCate1">
+                <option th:value="0" th:selected="${#strings.equals(param.cate1, '0')}">유형선택</option>
+                <option th:value="10" th:selected="${#strings.equals(param.cate1, '10')}">고객서비스</option>
+                <option th:value="11" th:selected="${#strings.equals(param.cate1, '11')}">안전거래</option>
+                <option th:value="12" th:selected="${#strings.equals(param.cate1, '12')}">위해상품</option>
+                <option th:value="13" th:selected="${#strings.equals(param.cate1, '13')}">이벤트당첨</option>
+            </select>
+            <input type="text" name="searchKeyword" id="searchKeyword" th:value="${param.search}" placeholder="검색어를 입력하세요." >
+            <input type="hidden" name="cate1" th:value="${param.cate1}">
+            <input type="hidden" name="search" th:value="${param.search}">
+        </div>
+        <table class="listTable">
+            <thead>
+            <tr>
+                <th><input type="checkbox" name="all"/></th>
+                <th>번호</th>
+                <th>1차 유형</th>
+                <th>2차 유형</th>
+                <th>제목</th>
+                <th>작성자</th>
+                <th>작성일</th>
+                <th>상태</th>
+            </tr>
+            </thead>
+            <tbody class="listTbody">
+            <tr th:each="article:${pageResponseDTO.getQnaList()}">
+                <th:block th:if="${article.parent} eq 0">
+                <td><input type="checkbox" name="chk" th:value="${article.qnaNo}"/></td>
+                <td>[[${article.qnaNo}]]</td>
+                <td>[[${article.c1Name}]]</td>
+                <td> [[${article.c2Name}]] </td>
+                <td><a th:href="@{/admin/cs/qna/view(qnaNo=${article.qnaNo})}">[[${article.title}]]</a></td>
+                <td>[[${article.writer}]]</td>
+                <td>[[${article.getRdateSub}]]</td>
+                <td th:if="${article.answerComplete} eq 1" style="color: blue">검토중</td>
+                <td th:if="${article.answerComplete} ne 1" style="color: red">답변완료</td>
+                </th:block>
+            </tr>
+            <tr th:if="${pageResponseDTO.getQnaList().size() eq 0}">
+                <td colspan="7">
+                    조회 결과가 없습니다.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div>
+            <input type="submit" value="선택삭제" class="deleteAll" />
+            <a th:href="@{/admin/cs/notice/write}" class="writeBtn">작성하기</a>
+        </div>
+    </form>
+    <div class="paging">
+        <span class="prev" th:if="${pageResponseDTO.prev}">
+            <a th:href="@{/admin/cs/qna/list(cate1=${pageResponseDTO.cate1},pg=${pageResponseDTO.start - 1}, search=${pageResponseDTO.getSearch()})}"><&nbsp;이전</a>
+        </span>
+
+        <span class="num"  th:each="num: ${#numbers.sequence(pageResponseDTO.start, pageResponseDTO.end)}">
+                <a th:href="@{/admin/cs/qna/list(cate1=${pageResponseDTO.cate1},pg=${num}, search=${pageResponseDTO.getSearch()})}" th:classappend="${num == pageResponseDTO.pg?'on':''}">[[${num}]]</a>
+        </span>
+
+        <span class="next" th:if="${pageResponseDTO.next}">
+                <a th:href="@{/admin/cs/qna/list(cate1=${pageResponseDTO.cate1},pg=${pageResponseDTO.end + 1}, search=${pageResponseDTO.getSearch()})}">다음&nbsp;></a>
+        </span>
+    </div>
+
+</section>
+    <!-- 상품목록 컨텐츠 끝 -->
+</section>
+</html>

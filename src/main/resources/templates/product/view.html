@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org"
+       xmlns:layout="http://www.thymeleaf.org"
+       layout:decorate="/product/_prod_layout"
+       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<!-- 상품 상세페이지 시작 -->
+<section class="view" layout:fragment="content">
+    <script th:inline="javascript">
+        $(function (){
+            let isLogin = $("input[name='isLogin']").val();
+            let num = parseInt($("input[name='num']").val());
+            let price1 = "[[${prod.price - prod.discountPrice}]]";
+            let delivery = parseInt("[[${prod.delivery}]]");
+            const origPoint = "[[${prod.point}]]";
+            let totalprice = 0;
+            let totalPoint = origPoint;
+
+            console.log("origPoint / " + origPoint + "/ totalPoint / " + totalPoint);
+
+            $('.increase').click(function (){
+                num = num+1;
+                $("input[name='num']").val(num);
+                $("input[name='count']").val(num);
+                updatePrice();
+                //updatePoint();
+            });
+
+            $('.decrease').click(function (){
+                if (num > 1){
+                    num = num - 1;
+                    $("input[name='num']").val(num);
+                    $("input[name='count']").val(num);
+                    updatePrice();
+                   // updatePoint();
+                }
+            });
+
+            $('.cart').click(function(){
+                if(isLogin > 0 ){
+                    document.getElementsByClassName('formCart')[0].submit();
+                } else{
+                    alert('로그인 후 구매가 가능합니다!');
+                    location.href="/LotteON/member/login";
+                }
+            });
+            function updatePrice(){
+                totalprice =  (price1 * num) + delivery ;
+                $('.totalPrice').text(totalprice.toLocaleString());
+                $('.tot').val(totalprice);
+            }
+            /*
+            function updatePoint(){
+                totalPoint = origPoint * num;
+                $("input[name='point']").val(totalPoint);
+            }
+            */
+
+        });
+    </script>
+
+    <!-- 제목, 페이지 네비게이션 -->
+    <nav>
+        <h1>상품보기</h1>
+        <p>
+            HOME > <span>패션·의류·뷰티</span> > <strong>남성의류</strong>
+        </p>
+    </nav>
+
+    <!-- 상품 전체 정보 내용 -->
+    <article class="info">
+        <div class="image">
+            <img th:src="@{'/thumbs/' + ${prod.thumb2}}" alt="상품이미지3" width="460px"/>
+        </div>
+        <div class="summary">
+            <nav>
+                <h1>[[${prod.seller}]]</h1>
+                <h2>상품번호&nbsp;:&nbsp;<span>[[${prod.prodNo}]]</span></h2>
+            </nav>
+            <nav>
+                <h3>[[${prod.prodName}]]</h3>
+                <p>[[${prod.descript}]]</p>
+                <h5 class="rating" th:classappend="${'star' + #numbers.formatDecimal(prod.score,1,0) }">
+                    <a id="goToReview" href="#">상품평보기</a>
+                </h5>
+
+            </nav>
+            <nav>
+                <div class="org_price">
+                    <del>[[${#numbers.formatInteger(prod.price,0,'COMMA')}]]</del>
+                    <span>[[${prod.discount}]]%</span>
+                </div>
+                <div class="dis_price">
+                    <ins>[[${#numbers.formatInteger(prod.price - (prod.discountPrice),0,'COMMA')}]]</ins>
+                </div>
+            </nav>
+            <nav>
+                <span class="delivery-noFree" th:if="${prod.delivery gt 0}">배송비 : [[${prod.delivery}]]원</span>
+                <span class="delivery" th:if="${prod.delivery eq 0}">무료배송</span>
+                <!--                <span class="delivery">무료배송</span>-->
+                <span class="arrival">모레(금) 7/8 도착예정</span>
+                <span class="desc">본 상품은 국내배송만 가능합니다.</span>
+            </nav>
+            <nav>
+                <span class="card cardfree"><i>아이콘</i>무이자할부</span>&nbsp;&nbsp;
+                <span class="card cardadd"><i>아이콘</i>카드추가혜택</span>
+            </nav>
+            <nav>
+                <span class="origin">원산지-상세설명 참조</span>
+            </nav>
+            <img th:src="@{/images/vip_plcc_banner.png}" alt="100원만 결제해도 1만원 적립!" class="banner" />
+
+            <div class="count">
+                <button class="decrease">-</button>
+                <input type="text" name="num" value="1" readonly/>
+                <button class="increase">+</button>
+            </div>
+
+            <div class="total">
+                <span class="totalPrice">[[${#numbers.formatInteger(prod.price - prod.discountPrice + prod.delivery,0,'COMMA')}]]</span>
+                <em>총 상품금액</em>
+            </div>
+            <form th:action="@{/product/cart}" class="formCart" method="post">
+            <div class="button">
+                <input type="button" class="cart"  value="장바구니"/>
+                <input type="button" class="order" value="구매하기"/>
+            </div>
+
+                <th:block sec:authorize="isAnonymous()">
+                    <input type="hidden" name="isLogin" value="0">
+                </th:block>
+                <th:block sec:authorize="isAuthenticated()">
+                    <input type="hidden" name="isLogin" value="1">
+                    <input type="hidden" name="uid" th:value="${#authentication.principal.user.uid}" />
+                </th:block>
+                <input type="hidden" name="prodNo" th:value="${prod.prodNo}" />
+                <input type="hidden" name="count" value="1" />
+                <input type="hidden" name="price" th:value="${prod.price}" />
+                <input type="hidden" name="discount" th:value="${prod.discount}" />
+                <input type="hidden" name="point" th:value="${prod.point}" />
+                <input type="hidden" name="delivery" th:value="${prod.delivery}" />
+                <input type="hidden" name="total"   class="tot" th:value="${prod.price - prod.discountPrice + prod.delivery}" />
+            </form>
+        </div>
+    </article>
+
+    <!-- 상품 정보 내용 -->
+    <article class="detail">
+        <nav>
+            <h1>상품정보</h1>
+        </nav>
+        <!-- 상품상세페이지 이미지 -->
+        <img th:src="@{'/thumbs/' + ${prod.thumb3}}" alt="상품이미지3"/>
+        <img th:src="@{'/thumbs/' + ${prod.detail}}" alt="상세이미지"/>
+    </article>
+
+    <!-- 상품 정보 제공 고시 내용 -->
+    <article class="notice">
+        <nav>
+            <h1>상품 정보 제공 고시</h1>
+            <p>[전자상거래에 관한 상품정보 제공에 관한 고시] 항목에 의거 등록된 정보입니다.</p>
+        </nav>
+        <table border="0">
+            <tr>
+                <td>상품번호</td>
+                <td>10110125435</td>
+            </tr>
+            <tr>
+                <td>상품상태</td>
+                <td>새상품</td>
+            </tr>
+            <tr>
+                <td>부가세 면세여부</td>
+                <td>과세상품</td>
+            </tr>
+            <tr>
+                <td>영수증발행</td>
+                <td>발행가능 - 신용카드 전표, 온라인 현금영수증</td>
+            </tr>
+            <tr>
+                <td>사업자구분</td>
+                <td>사업자 판매자</td>
+            </tr>
+            <tr>
+                <td>브랜드</td>
+                <td>블루포스</td>
+            </tr>
+            <tr>
+                <td>원산지</td>
+                <td>국내생산</td>
+            </tr>
+        </table>
+        <table border="0">
+            <tr>
+                <td>제품소재</td>
+                <td>상세정보 직접입력</td>
+            </tr>
+            <tr>
+                <td>색상</td>
+                <td>상세정보 직접입력</td>
+            </tr>
+            <tr>
+                <td>치수</td>
+                <td>상세정보 직접입력</td>
+            </tr>
+            <tr>
+                <td>제조자/수입국</td>
+                <td>상세정보 직접입력</td>
+            </tr>
+            <tr>
+                <td>제조국</td>
+                <td>상세정보 직접입력</td>
+            </tr>
+            <tr>
+                <td>취급시 주의사항</td>
+                <td>상세정보 직접입력</td>
+            </tr>
+            <tr>
+                <td>제조연월</td>
+                <td>상세정보 직접입력</td>
+            </tr>
+            <tr>
+                <td>품질보증기준</td>
+                <td>상세정보 직접입력</td>
+            </tr>
+            <tr>
+                <td>A/S 책임자와 전화번호</td>
+                <td>상세정보 직접입력</td>
+            </tr>
+            <tr>
+                <td>주문후 예상 배송기간</td>
+                <td>상세정보 직접입력</td>
+            </tr>
+            <tr>
+                <td colspan="2">구매, 교환, 반품, 배송, 설치 등과 관련하여 추가비용, 제한조건 등의 특이사항이 있는 경우</td>
+            </tr>
+        </table>
+        <p class="notice">
+            소비자가 전자상거래등에서 소비자 보호에 관한 법률 제 17조 제1항 또는 제3항에 따라 청약철회를 하고
+            동법 제 18조 제1항 에 따라 청약철회한 물품을 판매자에게 반환하였음에도 불구 하고 결제 대금의
+            환급이 3영업일을 넘게 지연된 경우, 소비자 는 전자상거래등에서 소비자보호에 관한 법률 제18조
+            제2항 및 동법 시행령 제21조 2에 따라 지연일수에 대하여 전상법 시행령으로 정하는 이율을 곱하여
+            산정한 지연이자(“지연배상금”)를 신청할 수 있습니다. 아울러, 교환∙반품∙보증 및 결제대금의
+            환급신청은 [나의쇼핑정보]에서 하실 수 있으며, 자세한 문의는 개별 판매자에게 연락하여 주시기 바랍니다.
+        </p>
+    </article>
+
+    <!-- 상품 리뷰 내용 -->
+    <article class="review" id="reviewDiv">
+        <nav>
+            <h1>상품리뷰</h1>
+        </nav>
+        <ul>
+            <li th:if="${pageResponseDTO.reviewList.size() eq 0}">
+                작성된 리뷰가 없습니다.
+            </li>
+            <li th:each="review : ${pageResponseDTO.reviewList}">
+                <div>
+                    <h5 class="rating" th:classappend="${'star' + review.rating}">상품평</h5>
+                    <span>[[${review.uidMasking + '     ' + review.subRDate}]]</span>
+                </div>
+                <!--<h3>상품명1/BLUE/L</h3>-->
+                <p>
+                    [[${review.content}]]
+                </p>
+            </li>
+        </ul>
+        <div class="paging">
+            <span  class="prev" th:if="${pageResponseDTO.prev}">
+                <a th:href="@{/my/ordered(pg=${pageResponseDTO.start - 1})}">< 이전</a>
+            </span>
+
+            <span  class="num"  th:each="num: ${#numbers.sequence(pageResponseDTO.start, pageResponseDTO.end)}">
+                <a th:href="@{/my/ordered(pg=${num} )}" th:classappend="${num == pageResponseDTO.pg?'on':''}">[[${num}]]</a>
+            </span>
+
+            <span  th:if="${pageResponseDTO.next}">
+                <a class="next" th:href="@{/my/ordered(pg=${pageResponseDTO.end + 1})}">다음</a>
+            </span>
+        </div>
+    </article>
+
+</section>
+<!-- 상품 상세페이지 끝 -->
+<script>
+    $(function (){
+
+    });
+</script>
+</html>

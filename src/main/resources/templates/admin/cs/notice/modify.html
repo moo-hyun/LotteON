@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org"
+       xmlns:layout="http://www.thymeleaf.org"
+       layout:decorate="/admin/admin_layout">
+
+<section id="admin-cs-notice-modify" layout:fragment="content">
+
+    <nav>
+      <h3>공지사항 수정</h3>
+      <p>
+        HOME > 고객센터 > <strong>공지사항</strong>
+      </p>
+    </nav>
+    <section class="modify">
+      <article>
+        <form th:action="@{/admin/cs/notice/modify}" method="post">
+          <table>
+            <tr>
+              <td>유형</td>
+              <td>
+                <select name="type" id="noticeCate">
+                  <option value="0">선택</option>
+                  <option>가입</option>
+                  <option>탈퇴</option>
+                  <option>회원정보</option>
+                  <option>로그인</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>제목</td>
+              <td>
+                <input type="text" name="title" th:value="${noticeDTO.title}"/>
+                <input type="text" name="noticeNo" readonly th:value="${noticeDTO.noticeNo}"/>
+              </td>
+            </tr>
+            <tr>
+              <td>내용</td>
+              <td>
+                <textarea name="content">[[${noticeDTO.content}]]</textarea>
+              </td>
+            </tr>
+          </table>
+          <div>
+            <input type="submit" class="btnSubmit" value="수정하기"/>
+            <a href="./list.html" class="btnList">취소하기</a>
+          </div>
+        </form>
+      </article>
+    </section>
+
+</section>
+
+</html>

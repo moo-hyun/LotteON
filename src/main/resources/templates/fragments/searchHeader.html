@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns="http://www.w3.org/1999/html"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<header  th:fragment="headerFragment">
+    <th:block th:replace="/fragments/_top_logo_search :: topLogoSearchFragment"></th:block>
+    <div class="menu">
+        <div>
+            <ul>
+                <li><a href="#">히트상품</a></li>
+                <li><a href="#">추천상품</a></li>
+                <li><a href="#">최신상품</a></li>
+                <li><a href="#">인기상품</a></li>
+                <li><a href="#">할인상품</a></li>
+            </ul>
+            <ul>
+                <li><a th:href="@{/cs/notice/list}">공지사항</a></li>
+                <li><a th:href="@{/cs/faq/list(cate1=20)}">자주묻는질문</a></li>
+                <li><a th:href="@{/cs/qna/list}">문의하기</a></li>
+                <li><a th:href="@{/cs/index}">고객센터</a></li>
+            </ul>
+        </div>
+    </div>
+</header>
+
+
+</html>

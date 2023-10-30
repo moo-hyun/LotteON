@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+ xmlns:layout="http://www.thymeleaf.org"
+      xmlns="http://www.w3.org/1999/html">
+<head>
+  <meta charset="UTF-8">
+  <title>롯데ON::롯데 온라인 쇼핑몰</title>
+  <th:block th:replace="/fragments/config :: configFragment"></th:block>
+  <link rel="stylesheet" th:href="@{/member/css/member.css}"/>
+</head>
+<body>
+<div id="wrapper">
+
+  <th:block th:replace="/fragments/header :: headerFragment"></th:block>
+  <main id="member">
+    <div layout:fragment="content"></div>
+  </main>
+  <th:block th:replace="/fragments/footer :: footerFragment"></th:block>
+</div>
+</body>
+</html>
